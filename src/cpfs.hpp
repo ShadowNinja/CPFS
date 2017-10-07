@@ -200,15 +200,15 @@ Status status(const Path &path);
 
 // Checks if the path exists.
 bool exists(const Path &path, std::error_code &ec) noexcept;
-bool exists(const Path &path);
+bool exists(const Path &path) noexcept;
 
 // Checks if the paths points to an existing regular file.
 bool is_file(const Path &path, std::error_code &ec) noexcept;
-bool is_file(const Path &path);
+bool is_file(const Path &path) noexcept;
 
 // Checks if the path points to an existing directory.
 bool is_directory(const Path &path, std::error_code &ec) noexcept;
-bool is_directory(const Path &path);
+bool is_directory(const Path &path) noexcept;
 
 
 // Attempts to creates a directory at the specified path.

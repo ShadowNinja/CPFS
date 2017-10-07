@@ -193,9 +193,10 @@ std::chrono::system_clock::time_point Status::ctime() const { return GET_STAT_TI
 	{ \
 		return status(path, ec).cond; \
 	} \
-	bool func_name(const Path &path) \
+	bool func_name(const Path &path) noexcept \
 	{ \
-		return status(path).cond; \
+		std::error_code ec; \
+		return status(path, ec).cond; \
 	}
 
 STATUS_WRAPPER(exists, type() != FileType::NotFound)
