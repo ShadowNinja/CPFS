@@ -1,29 +1,19 @@
-CPFS - simple Cross-Platform FileSystem library
+CPFS
 ===
+
+CPFS is a simple Cross-Platform FileSystem library for C++, loosly modeled after
+C++17's std::filesystem (which is too new for some prople to use).
 
 Documentation
 ---
 
-See `src/cpfs.h` for documentation on all of the included functions.
+See `src/cpfs.hpp` for documentation.
 
 ### Example
 
-Here's a snippet of code to list all entries in a directory.  See `src/ls.c` for a full example.
-```C
-CpfsPath path;
-cpfs_path_create(&path, "/tmp");
-CpfsDirIter it;
-if (!cpfs_dir_create(&it, &path)) {
-	cpfs_path_destroy(&path);
-	return;
+Here's a snippet of code to list all entries in a directory.  See `src/ls.cpp` for a full example.
+```C++
+for (const auto &entry : cpfs::DirIter("/tmp")) {
+	std::cout << entry.name().utf8() << std::endl;
 }
-while (cpfs_dir_next(&it)) {
-	CpfsPath name;
-	cpfs_dir_name(&it, &name);
-	char *name_utf8 = cpfs_path_utf8(&name);
-	printf("%s\n", name_utf8);
-	cpfs_path_utf8_destroy(name_utf8);
-}
-cpfs_dir_destroy(&it);
-cpfs_path_destroy(&path);
 ```
