@@ -220,6 +220,8 @@ bool create_directory(const Path &path, std::error_code &ec) noexcept
 	return true;
 }
 
+NO_EC_WRAPPER(bool, create_directory, "Failed to create directory.")
+
 
 FILE* file_open(const Path &path, const char *mode)
 {

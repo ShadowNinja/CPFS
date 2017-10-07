@@ -200,6 +200,7 @@ Status status(const Path &path);
 
 // Checks if the path exists.
 bool exists(const Path &path, std::error_code &ec) noexcept;
+bool exists(const Path &path);
 
 // Checks if the paths points to an existing regular file.
 bool is_file(const Path &path, std::error_code &ec) noexcept;
