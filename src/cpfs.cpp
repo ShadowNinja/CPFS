@@ -19,6 +19,19 @@ namespace cpfs {
 
 static void remove_subitems(const Path &path, std::error_code &ec) noexcept;
 
+#define NO_EC_WRAPPER(ret_type, func_name, err_msg) \
+	ret_type func_name(const Path &path) \
+	{ \
+		std::error_code ec; \
+		ret_type ret = func_name(path, ec); \
+		if (ec) { \
+			throw FilesystemError(err_msg \
+					"\nPath: " + path.utf8() + \
+					"\nError:" + ec.message()); \
+		} \
+		return ret; \
+	}
+
 #ifdef _WIN32
 
 #ifndef MB_ERR_INVALID_CHARS
@@ -131,6 +144,7 @@ Status status(const Path &path, std::error_code &ec) noexcept
 	return st;
 }
 
+NO_EC_WRAPPER(Status, status, "Failed to retreive file status.")
 
 FileType Status::type() const
 {
@@ -174,22 +188,19 @@ std::chrono::system_clock::time_point Status::mtime() const { return GET_STAT_TI
 std::chrono::system_clock::time_point Status::ctime() const { return GET_STAT_TIME(c); }
 
 
-bool exists(const Path &path, std::error_code &ec) noexcept
-{
-	return status(path, ec).type() != FileType::NotFound;
-}
+#define STATUS_WRAPPER(func_name, cond) \
+	bool func_name(const Path &path, std::error_code &ec) noexcept \
+	{ \
+		return status(path, ec).cond; \
+	} \
+	bool func_name(const Path &path) \
+	{ \
+		return status(path).cond; \
+	}
 
-
-bool is_file(const Path &path, std::error_code &ec) noexcept
-{
-	return status(path, ec).type() == FileType::Regular;
-}
-
-
-bool is_directory(const Path &path, std::error_code &ec) noexcept
-{
-	return status(path, ec).type() == FileType::Directory;
-}
+STATUS_WRAPPER(exists, type() != FileType::NotFound)
+STATUS_WRAPPER(is_file, type() == FileType::Regular)
+STATUS_WRAPPER(is_directory, type() == FileType::Directory)
 
 
 bool create_directory(const Path &path, std::error_code &ec) noexcept
@@ -249,6 +260,8 @@ bool remove(const Path &path, std::error_code &ec) noexcept
 	return ok;
 }
 
+NO_EC_WRAPPER(bool, remove, "Failed to remove file/directory.")
+
 bool remove_recursive(const Path &path, std::error_code &ec) noexcept
 {
 	ec.clear();
@@ -259,6 +272,8 @@ bool remove_recursive(const Path &path, std::error_code &ec) noexcept
 	if (ec) return false;
 	return remove(path, ec);
 }
+
+NO_EC_WRAPPER(bool, remove_recursive, "Failed to recursively remove directory tree.")
 
 // Helper for remove_recursive, assumes that the path points to a directory and
 // only deletes its contents (not the directory itself).
@@ -281,8 +296,9 @@ DirIter::DirIter(const Path &path)
 	std::error_code ec;
 	init(path, ec);
 	if (ec) {
-		throw FilesystemError("Failed to create directory iterator: " +
-				ec.message());
+		throw FilesystemError("Failed to create directory iterator."
+			"\nPath: " + path.utf8() +
+			"\nError:" + ec.message());
 	}
 }
 

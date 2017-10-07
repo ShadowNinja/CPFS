@@ -73,6 +73,7 @@ public:
 
 	// Creates a new Path from a UTF-8 string.
 	Path(const char *utf8);
+	Path(const std::string &utf8) : Path(utf8.c_str()) {}
 #ifdef _WIN32
 	// Creates a new Path from a native string.
 	Path(const NativeChar *native) : path(native) {}
@@ -194,21 +195,25 @@ private:
 
 // Retreives information about a file.
 Status status(const Path &path, std::error_code &ec) noexcept;
+Status status(const Path &path);
 
 
 // Checks if the path exists.
 bool exists(const Path &path, std::error_code &ec) noexcept;
 
-// Checks if the paths points to an existing file.
+// Checks if the paths points to an existing regular file.
 bool is_file(const Path &path, std::error_code &ec) noexcept;
+bool is_file(const Path &path);
 
 // Checks if the path points to an existing directory.
 bool is_directory(const Path &path, std::error_code &ec) noexcept;
+bool is_directory(const Path &path);
 
 
 // Attempts to creates a directory at the specified path.
 // Returns whether the directory was successfully created.
 bool create_directory(const Path &path, std::error_code &ec) noexcept;
+bool create_directory(const Path &path);
 
 // Opens a new file with the specified mode.
 // Like fopen(), but supports wide chars on Windows.
@@ -216,9 +221,11 @@ FILE* file_open(const Path &path, const char *mode);
 
 // Removes a file or empty directory.  Returns whether the operation succeeded.
 bool remove(const Path &path, std::error_code &ec) noexcept;
+bool remove(const Path &path);
 
 // Recursively removes all files and directories in a directory tree.
 // Returns whether the operation succeeded.
 bool remove_recursive(const Path &path, std::error_code &ec) noexcept;
+bool remove_recursive(const Path &path);
 
 } // namespace cpfs
